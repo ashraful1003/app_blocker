@@ -1,0 +1,39 @@
+# Flutter / Dart
+build/
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+# pubspec.lock is committed for apps (not packages)
+
+# Android
+*.iml
+.gradle/
+local.properties
+android/.gradle/
+android/app/build/
+android/build/
+android/rules-engine/build/
+
+# IDE
+.idea/
+*.swp
+*.swo
+.vscode/
+
+# Signing (never commit)
+*.jks
+*.keystore
+key.properties
+keystore-base64.txt
+
+# Environment
+.env
+.env.*
+
+# Coverage
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db

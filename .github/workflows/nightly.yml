@@ -1,0 +1,40 @@
+name: Nightly emulator test
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  emulator-test:
+    name: Emulator smoke test
+    runs-on: ubuntu-latest
+    # Enable from milestone M2 onward
+    if: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: pubspec.yaml
+          channel: stable
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build debug APK
+        run: flutter build apk --debug
+
+      - name: Start emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          script: |
+            adb install build/app/outputs/flutter-apk/app-debug.apk
+            # Enable accessibility service
+            adb shell settings put secure enabled_accessibility_services app.blocker/app.blocker.accessibility.BlockerAccessibilityService
+            # TODO: Add smoke test steps from M2 onward
+            echo "Nightly emulator test placeholder"
