@@ -172,6 +172,72 @@ class ScheduleEvaluatorTest {
         }
     }
 
+    @Test
+    fun `test vectors timezone shift`() {
+        val json = loadTestVector("timezone_shift.json")
+        val scheduleObj = json.getAsJsonObject("schedule")
+        val schedule =
+            Schedule(
+                startTime =
+                    LocalTime.of(
+                        scheduleObj.get("startHour").asInt,
+                        scheduleObj.get("startMinute").asInt,
+                    ),
+                endTime =
+                    LocalTime.of(
+                        scheduleObj.get("endHour").asInt,
+                        scheduleObj.get("endMinute").asInt,
+                    ),
+                days =
+                    scheduleObj
+                        .getAsJsonArray("days")
+                        .map { DayOfWeek.valueOf(it.asString) }
+                        .toSet(),
+            )
+
+        val cases = json.getAsJsonArray("cases")
+        for (caseElement in cases) {
+            val caseObj = caseElement.asJsonObject
+            val dayOfWeek = DayOfWeek.valueOf(caseObj.get("dayOfWeek").asString)
+            val timeParts = caseObj.get("localDateTime").asString.substringAfter("T")
+            val localTime = LocalTime.parse(timeParts)
+            val expected = caseObj.get("expected").asBoolean
+            val description = caseObj.get("description").asString
+
+            assertEquals(
+                description,
+                expected,
+                ScheduleEvaluator.isActive(schedule, dayOfWeek, localTime),
+            )
+        }
+    }
+
+    @Test
+    fun `startTime equals endTime means 24h schedule`() {
+        val schedule =
+            Schedule(
+                startTime = LocalTime.of(9, 0),
+                endTime = LocalTime.of(9, 0),
+                days = setOf(DayOfWeek.MONDAY),
+            )
+        assertTrue(ScheduleEvaluator.isActive(schedule, DayOfWeek.MONDAY, LocalTime.of(9, 0)))
+        assertTrue(ScheduleEvaluator.isActive(schedule, DayOfWeek.MONDAY, LocalTime.of(23, 59)))
+        assertTrue(ScheduleEvaluator.isActive(schedule, DayOfWeek.TUESDAY, LocalTime.of(8, 59)))
+        assertFalse(ScheduleEvaluator.isActive(schedule, DayOfWeek.TUESDAY, LocalTime.of(9, 0)))
+    }
+
+    @Test
+    fun `empty days set means always inactive`() {
+        val schedule =
+            Schedule(
+                startTime = LocalTime.of(9, 0),
+                endTime = LocalTime.of(17, 0),
+                days = emptySet(),
+            )
+        assertFalse(ScheduleEvaluator.isActive(schedule, DayOfWeek.MONDAY, LocalTime.of(12, 0)))
+        assertFalse(ScheduleEvaluator.isActive(schedule, DayOfWeek.FRIDAY, LocalTime.of(10, 0)))
+    }
+
     private fun weekdayOvernight(): Schedule =
         Schedule(
             startTime = LocalTime.of(22, 0),

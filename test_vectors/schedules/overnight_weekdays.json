@@ -45,7 +45,7 @@
       "expected": false
     },
     {
-      "description": "Active Monday 00:30 (continuation of Sunday overnight — Sunday not in days but Monday's window hasn't started; actually this is continuation of no window)",
+      "description": "Inactive Monday 00:30 (Sunday not in schedule days, no overnight continuation)",
       "localDateTime": "2026-11-16T00:30:00",
       "dayOfWeek": "MONDAY",
       "expected": false
@@ -63,7 +63,7 @@
       "expected": true
     },
     {
-      "description": "Inactive at exactly start time boundary",
+      "description": "Active at exactly start time boundary (start is inclusive)",
       "localDateTime": "2026-11-13T22:00:00",
       "dayOfWeek": "FRIDAY",
       "expected": true
