@@ -1,0 +1,19 @@
+name: Claude PR Review
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  review:
+    name: Claude Code Review
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: anthropics/claude-code-action@v1
+        with:
+          prompt: /pr-review ${{ github.event.pull_request.number }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
