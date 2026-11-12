@@ -14,6 +14,13 @@ kotlin {
     }
 }
 
+sourceSets {
+    test {
+        resources.srcDir(rootProject.projectDir.resolve("../test_vectors"))
+    }
+}
+
 dependencies {
     testImplementation("junit:junit:4.13.2")
+    testImplementation("com.google.code.gson:gson:2.11.0")
 }
