@@ -51,11 +51,7 @@ jobs:
 
       - name: ktlintCheck and rules-engine tests
         working-directory: android
-        run: ./gradlew ktlintCheck :rules-engine:test
-
-      - name: Android unit tests
-        working-directory: android
-        run: ./gradlew :app:testDebugUnitTest
+        run: ./gradlew :rules-engine:ktlintCheck :rules-engine:test
 
   build-apk:
     name: Build debug APK
@@ -73,6 +69,10 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+
+      - name: Android unit tests
+        working-directory: android
+        run: ./gradlew :app:testDebugUnitTest
 
       - name: Build debug APK
         run: flutter build apk --debug

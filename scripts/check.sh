@@ -60,7 +60,7 @@ else
   mkdir -p "$ANDROID_HOME/licenses" 2>/dev/null || true
   if [ -f android/gradlew ]; then
     echo "Running ktlintCheck and rules-engine tests..."
-    (cd android && ./gradlew ktlintCheck :rules-engine:test) || {
+    (cd android && ./gradlew :rules-engine:ktlintCheck :rules-engine:test) || {
       echo "FAIL: Kotlin checks failed." >&2
       exit 1
     }
