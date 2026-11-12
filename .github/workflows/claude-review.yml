@@ -12,8 +12,9 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      models: write
     steps:
       - uses: anthropics/claude-code-action@v1
         with:
           prompt: /pr-review ${{ github.event.pull_request.number }}
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          copilot_api_key: ${{ secrets.COPILOT_API_KEY }}
