@@ -37,6 +37,8 @@ Duration clampAllowance(Duration allowance) {
   return allowance;
 }
 
+// Calendar-day comparison: the caller supplies dates from a trusted source.
+// ADR-0003's monotonic clock covers elapsed-time accumulation, not day boundaries.
 bool shouldResetUsage({
   required DateTime lastResetDate,
   required DateTime currentDate,
