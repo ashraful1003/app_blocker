@@ -1,0 +1,85 @@
+{
+  "description": "Daily limit evaluation — FRD FR-04 acceptance checks",
+  "cases": [
+    {
+      "description": "30-minute limit reached after exactly 30 minutes",
+      "allowanceMinutes": 30,
+      "usedSeconds": 1800,
+      "expectedBlocked": true,
+      "expectedWarning": false,
+      "expectedRemainingSeconds": 0
+    },
+    {
+      "description": "30-minute limit not yet reached at 29 minutes (within warning)",
+      "allowanceMinutes": 30,
+      "usedSeconds": 1740,
+      "expectedBlocked": false,
+      "expectedWarning": true,
+      "expectedRemainingSeconds": 60
+    },
+    {
+      "description": "5-minute warning fires at 25 of 30 minutes used",
+      "allowanceMinutes": 30,
+      "usedSeconds": 1500,
+      "expectedBlocked": false,
+      "expectedWarning": true,
+      "expectedRemainingSeconds": 300
+    },
+    {
+      "description": "No warning at 24 minutes (6 minutes remaining)",
+      "allowanceMinutes": 30,
+      "usedSeconds": 1440,
+      "expectedBlocked": false,
+      "expectedWarning": false,
+      "expectedRemainingSeconds": 360
+    },
+    {
+      "description": "Warning at 4 minutes remaining",
+      "allowanceMinutes": 30,
+      "usedSeconds": 1560,
+      "expectedBlocked": false,
+      "expectedWarning": true,
+      "expectedRemainingSeconds": 240
+    },
+    {
+      "description": "Zero usage, not blocked",
+      "allowanceMinutes": 30,
+      "usedSeconds": 0,
+      "expectedBlocked": false,
+      "expectedWarning": false,
+      "expectedRemainingSeconds": 1800
+    },
+    {
+      "description": "Exceeded limit (31 minutes used of 30 allowed)",
+      "allowanceMinutes": 30,
+      "usedSeconds": 1860,
+      "expectedBlocked": true,
+      "expectedWarning": false,
+      "expectedRemainingSeconds": 0
+    },
+    {
+      "description": "Minimum allowance of 5 minutes, blocked at 5 minutes",
+      "allowanceMinutes": 5,
+      "usedSeconds": 300,
+      "expectedBlocked": true,
+      "expectedWarning": false,
+      "expectedRemainingSeconds": 0
+    },
+    {
+      "description": "Minimum allowance, warning at 0 used (5 min = warning threshold)",
+      "allowanceMinutes": 5,
+      "usedSeconds": 0,
+      "expectedBlocked": false,
+      "expectedWarning": true,
+      "expectedRemainingSeconds": 300
+    },
+    {
+      "description": "Maximum allowance of 480 minutes (8 hours), not blocked",
+      "allowanceMinutes": 480,
+      "usedSeconds": 28500,
+      "expectedBlocked": false,
+      "expectedWarning": true,
+      "expectedRemainingSeconds": 300
+    }
+  ]
+}
