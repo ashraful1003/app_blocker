@@ -70,6 +70,9 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Install dependencies
+        run: flutter pub get
+
       - name: Android unit tests
         working-directory: android
         run: ./gradlew :app:testDebugUnitTest
