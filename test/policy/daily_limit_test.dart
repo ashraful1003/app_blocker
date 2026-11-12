@@ -107,6 +107,20 @@ void main() {
         const Duration(hours: 1),
       );
     });
+
+    test('returns 5 minutes unchanged at lower boundary', () {
+      expect(
+        clampAllowance(const Duration(minutes: 5)),
+        const Duration(minutes: 5),
+      );
+    });
+
+    test('returns 8 hours unchanged at upper boundary', () {
+      expect(
+        clampAllowance(const Duration(hours: 8)),
+        const Duration(hours: 8),
+      );
+    });
   });
 
   group('shouldResetUsage', () {
@@ -135,6 +149,16 @@ void main() {
         shouldResetUsage(
           lastResetDate: DateTime(2026, 10, 31),
           currentDate: DateTime(2026, 11, 1),
+        ),
+        isTrue,
+      );
+    });
+
+    test('resets across year boundary', () {
+      expect(
+        shouldResetUsage(
+          lastResetDate: DateTime(2026, 12, 31),
+          currentDate: DateTime(2027, 1, 1),
         ),
         isTrue,
       );

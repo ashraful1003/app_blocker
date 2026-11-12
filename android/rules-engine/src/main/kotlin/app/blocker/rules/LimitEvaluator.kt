@@ -6,12 +6,18 @@ object LimitEvaluator {
     fun isBlocked(
         allowanceMinutes: Int,
         usedSeconds: Long,
-    ): Boolean = remainingSeconds(allowanceMinutes, usedSeconds) <= 0
+    ): Boolean {
+        require(allowanceMinutes >= 0)
+        require(usedSeconds >= 0)
+        return remainingSeconds(allowanceMinutes, usedSeconds) <= 0
+    }
 
     fun shouldWarn(
         allowanceMinutes: Int,
         usedSeconds: Long,
     ): Boolean {
+        require(allowanceMinutes >= 0)
+        require(usedSeconds >= 0)
         val remaining = remainingSeconds(allowanceMinutes, usedSeconds)
         return remaining > 0 && remaining <= WARNING_THRESHOLD_SECONDS
     }
@@ -20,6 +26,8 @@ object LimitEvaluator {
         allowanceMinutes: Int,
         usedSeconds: Long,
     ): Long {
+        require(allowanceMinutes >= 0)
+        require(usedSeconds >= 0)
         val allowanceSeconds = allowanceMinutes.toLong() * 60
         return maxOf(0L, allowanceSeconds - usedSeconds)
     }

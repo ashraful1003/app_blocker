@@ -18,6 +18,8 @@ DailyLimitStatus evaluateDailyLimit({
   required Duration allowance,
   required Duration usedToday,
 }) {
+  assert(!allowance.isNegative);
+  assert(!usedToday.isNegative);
   final remaining = usedToday >= allowance
       ? Duration.zero
       : allowance - usedToday;
@@ -39,6 +41,8 @@ Duration clampAllowance(Duration allowance) {
 
 // Calendar-day comparison: the caller supplies dates from a trusted source.
 // ADR-0003's monotonic clock covers elapsed-time accumulation, not day boundaries.
+// The data layer should also verify a monotonic minimum interval since the last
+// reset to guard against clock-forward attacks.
 bool shouldResetUsage({
   required DateTime lastResetDate,
   required DateTime currentDate,
