@@ -1,0 +1,78 @@
+{
+  "description": "22:00-07:00 weekdays schedule — FRD FR-03 acceptance check",
+  "schedule": {
+    "startHour": 22,
+    "startMinute": 0,
+    "endHour": 7,
+    "endMinute": 0,
+    "days": ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]
+  },
+  "cases": [
+    {
+      "description": "Active Friday 23:30 (within overnight window started Friday)",
+      "localDateTime": "2026-11-13T23:30:00",
+      "dayOfWeek": "FRIDAY",
+      "expected": true
+    },
+    {
+      "description": "Active Saturday 02:00 (continuation of Friday overnight)",
+      "localDateTime": "2026-11-14T02:00:00",
+      "dayOfWeek": "SATURDAY",
+      "expected": true
+    },
+    {
+      "description": "Inactive Saturday 07:00 (window ended)",
+      "localDateTime": "2026-11-14T07:00:00",
+      "dayOfWeek": "SATURDAY",
+      "expected": false
+    },
+    {
+      "description": "Not started Saturday 22:00 (Saturday not in schedule days)",
+      "localDateTime": "2026-11-14T22:00:00",
+      "dayOfWeek": "SATURDAY",
+      "expected": false
+    },
+    {
+      "description": "Inactive Saturday 23:30 (Saturday not in schedule days)",
+      "localDateTime": "2026-11-14T23:30:00",
+      "dayOfWeek": "SATURDAY",
+      "expected": false
+    },
+    {
+      "description": "Inactive Sunday 03:00 (Saturday not in schedule days, no overnight)",
+      "localDateTime": "2026-11-15T03:00:00",
+      "dayOfWeek": "SUNDAY",
+      "expected": false
+    },
+    {
+      "description": "Active Monday 00:30 (continuation of Sunday overnight — Sunday not in days but Monday's window hasn't started; actually this is continuation of no window)",
+      "localDateTime": "2026-11-16T00:30:00",
+      "dayOfWeek": "MONDAY",
+      "expected": false
+    },
+    {
+      "description": "Active Monday 22:30 (Monday is in schedule days)",
+      "localDateTime": "2026-11-16T22:30:00",
+      "dayOfWeek": "MONDAY",
+      "expected": true
+    },
+    {
+      "description": "Active Tuesday 06:59 (continuation of Monday overnight)",
+      "localDateTime": "2026-11-17T06:59:00",
+      "dayOfWeek": "TUESDAY",
+      "expected": true
+    },
+    {
+      "description": "Inactive at exactly start time boundary",
+      "localDateTime": "2026-11-13T22:00:00",
+      "dayOfWeek": "FRIDAY",
+      "expected": true
+    },
+    {
+      "description": "Inactive Wednesday 12:00 (daytime, not in window)",
+      "localDateTime": "2026-11-18T12:00:00",
+      "dayOfWeek": "WEDNESDAY",
+      "expected": false
+    }
+  ]
+}
