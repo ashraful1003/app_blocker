@@ -16,8 +16,8 @@ weaken any rule while strict mode is on.
 4. Run scripts/check.sh. Never finish with a failing check.
 5. Ask the reviewer subagent to review your diff. Fix what it finds.
 6. Open a pull request using the template. Tick every acceptance check.
-7. When PR review comments arrive, fix them, push, and reply on each thread
-   explaining what you changed (or why no change was needed).
+7. When PR review comments arrive, fix them, push, reply on each thread
+   explaining what you changed (or why no change was needed), then resolve the thread.
 8. If a task needs a real phone (blocking, overlays, Device admin, browsers),
    add the exact steps to docs/testing/device-checklist.md and say so in the PR.
 
