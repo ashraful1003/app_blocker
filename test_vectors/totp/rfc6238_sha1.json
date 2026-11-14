@@ -1,0 +1,12 @@
+{
+  "description": "RFC 6238 Appendix B TOTP test vectors (SHA-1), truncated from 8 to 6 digits. The RFC's ASCII key '12345678901234567890' is re-expressed as its base32 encoding, since this module takes secrets in the base32 form shown to authenticator apps.",
+  "secretBase32": "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ",
+  "cases": [
+    { "unixSeconds": 59, "expectedCode": "287082" },
+    { "unixSeconds": 1111111109, "expectedCode": "081804" },
+    { "unixSeconds": 1111111111, "expectedCode": "050471" },
+    { "unixSeconds": 1234567890, "expectedCode": "005924" },
+    { "unixSeconds": 2000000000, "expectedCode": "279037" },
+    { "unixSeconds": 20000000000, "expectedCode": "353130" }
+  ]
+}

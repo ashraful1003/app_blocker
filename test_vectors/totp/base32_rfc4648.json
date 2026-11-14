@@ -1,0 +1,11 @@
+{
+  "description": "RFC 4648 Section 10 base32 test vectors, used to pin down the base32 decoder independently of the HOTP/TOTP math (decodedAscii bytes, utf8-encoded, must equal the decode of secretBase32).",
+  "cases": [
+    { "secretBase32": "MY======", "decodedAscii": "f" },
+    { "secretBase32": "MZXQ====", "decodedAscii": "fo" },
+    { "secretBase32": "MZXW6===", "decodedAscii": "foo" },
+    { "secretBase32": "MZXW6YQ=", "decodedAscii": "foob" },
+    { "secretBase32": "MZXW6YTB", "decodedAscii": "fooba" },
+    { "secretBase32": "MZXW6YTBOI======", "decodedAscii": "foobar" }
+  ]
+}

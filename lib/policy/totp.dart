@@ -13,7 +13,7 @@ const _base32Alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 /// shown to authenticator apps) at [unixSeconds].
 String generateCode({required String secret, required int unixSeconds}) {
   final counter = _counterFor(unixSeconds);
-  return _hotp(key: _base32Decode(secret), counter: counter);
+  return _hotp(key: base32Decode(secret), counter: counter);
 }
 
 /// Whether [code] matches [secret] at [unixSeconds], allowing codes from
@@ -26,7 +26,7 @@ bool isValidCode(
 }) {
   if (!_codePattern.hasMatch(code)) return false;
 
-  final key = _base32Decode(secret);
+  final key = base32Decode(secret);
   final counter = _counterFor(unixSeconds);
   var matched = false;
   for (var offset = -_toleranceSteps; offset <= _toleranceSteps; offset++) {
@@ -59,7 +59,7 @@ bool _constantTimeEquals(String a, String b) {
 }
 
 String _hotp({required List<int> key, required int counter}) {
-  final counterBytes = ByteData(8)..setInt64(0, counter);
+  final counterBytes = ByteData(8)..setInt64(0, counter, Endian.big);
   final hash = Hmac(sha1, key).convert(counterBytes.buffer.asUint8List()).bytes;
 
   final offset = hash[hash.length - 1] & 0xf;
@@ -83,9 +83,15 @@ int _pow10(int exponent) {
 
 /// Decodes an RFC 4648 base32 string (the format authenticator apps show
 /// and scan via QR code) into raw key bytes. Padding ('=') is optional.
-List<int> _base32Decode(String secret) {
+///
+/// [secret] is never included in a thrown error's message, since it is a
+/// shared secret and must not end up in logs or crash reports. Callers must
+/// only pass secrets from a trusted source (partner setup): this function
+/// is not hardened against leaking a secret's shape via timing, which would
+/// matter only if a caller ever decoded untrusted, user-typed text here.
+List<int> base32Decode(String secret) {
   if (secret.isEmpty) {
-    throw ArgumentError.value(secret, 'secret', 'must not be empty');
+    throw ArgumentError('secret must not be empty');
   }
 
   final cleaned = secret.toUpperCase().replaceAll('=', '');
@@ -96,7 +102,7 @@ List<int> _base32Decode(String secret) {
   for (final char in cleaned.split('')) {
     final value = _base32Alphabet.indexOf(char);
     if (value == -1) {
-      throw ArgumentError.value(secret, 'secret', 'not valid base32');
+      throw ArgumentError('secret is not valid base32');
     }
     buffer = (buffer << 5) | value;
     bitsInBuffer += 5;
@@ -107,7 +113,7 @@ List<int> _base32Decode(String secret) {
   }
 
   if (bytes.isEmpty) {
-    throw ArgumentError.value(secret, 'secret', 'must not be empty');
+    throw ArgumentError('secret decodes to no usable bytes');
   }
   return bytes;
 }

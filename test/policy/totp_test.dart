@@ -1,28 +1,25 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:blocker/policy/totp.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-// RFC 6238 Appendix B test vectors (SHA-1), truncated to 6 digits
-// (the standard 8-digit vectors mod 10^6). The RFC's key is the ASCII
-// string '12345678901234567890'; base32-encoded, as a real secret would be
-// shown to an authenticator app, that is 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ'.
-const secret = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
-
 void main() {
   group('generateCode (RFC 6238 SHA-1 vectors)', () {
-    const vectors = <int, String>{
-      59: '287082',
-      1111111109: '081804',
-      1111111111: '050471',
-      1234567890: '005924',
-      2000000000: '279037',
-      20000000000: '353130',
-    };
+    final file = File('test_vectors/totp/rfc6238_sha1.json');
+    final vectors = jsonDecode(file.readAsStringSync()) as Map<String, Object?>;
+    final secret = vectors['secretBase32']! as String;
+    final cases = vectors['cases']! as List<Object?>;
 
-    for (final entry in vectors.entries) {
-      test('matches RFC 6238 vector at ${entry.key} seconds', () {
+    for (final rawCase in cases) {
+      final testCase = rawCase! as Map<String, Object?>;
+      final unixSeconds = testCase['unixSeconds']! as int;
+      final expectedCode = testCase['expectedCode']! as String;
+
+      test('matches RFC 6238 vector at $unixSeconds seconds', () {
         expect(
-          generateCode(secret: secret, unixSeconds: entry.key),
-          entry.value,
+          generateCode(secret: secret, unixSeconds: unixSeconds),
+          expectedCode,
         );
       });
     }
@@ -54,9 +51,48 @@ void main() {
         throwsArgumentError,
       );
     });
+
+    test('rejects a secret that decodes to no usable bytes', () {
+      expect(
+        () => generateCode(secret: 'A', unixSeconds: 59),
+        throwsArgumentError,
+      );
+    });
+
+    test('never includes the secret in a thrown error message', () {
+      const secretValue = 'super-secret-value-should-not-leak';
+      expect(
+        () => generateCode(secret: secretValue, unixSeconds: 59),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.toString(),
+            'toString()',
+            isNot(contains(secretValue)),
+          ),
+        ),
+      );
+    });
+  });
+
+  group('base32Decode (RFC 4648 vectors)', () {
+    final file = File('test_vectors/totp/base32_rfc4648.json');
+    final vectors = jsonDecode(file.readAsStringSync()) as Map<String, Object?>;
+    final cases = vectors['cases']! as List<Object?>;
+
+    for (final rawCase in cases) {
+      final testCase = rawCase! as Map<String, Object?>;
+      final secretBase32 = testCase['secretBase32']! as String;
+      final decodedAscii = testCase['decodedAscii']! as String;
+
+      test('decodes $secretBase32 to "$decodedAscii"', () {
+        expect(base32Decode(secretBase32), utf8.encode(decodedAscii));
+      });
+    }
   });
 
   group('isValidCode', () {
+    const secret = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
+
     test('accepts a code from the current time step', () {
       const now = 1111111109;
       final code = generateCode(secret: secret, unixSeconds: now);
