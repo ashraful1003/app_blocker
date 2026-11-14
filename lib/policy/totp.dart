@@ -9,6 +9,8 @@ const _toleranceSteps = 1;
 
 /// RFC 6238 TOTP code for [secret] (an ASCII shared secret) at [unixSeconds].
 String generateCode({required String secret, required int unixSeconds}) {
+  assert(secret.isNotEmpty, 'secret must not be empty');
+  assert(unixSeconds >= 0, 'unixSeconds must not be negative');
   final counter = unixSeconds ~/ _timeStepSeconds;
   return _hotp(secret: secret, counter: counter);
 }
@@ -20,15 +22,28 @@ bool isValidCode(
   required String secret,
   required int unixSeconds,
 }) {
+  assert(secret.isNotEmpty, 'secret must not be empty');
+  assert(unixSeconds >= 0, 'unixSeconds must not be negative');
   if (!RegExp(r'^\d{6}$').hasMatch(code)) return false;
 
   final counter = unixSeconds ~/ _timeStepSeconds;
+  var matched = false;
   for (var offset = -_toleranceSteps; offset <= _toleranceSteps; offset++) {
-    if (_hotp(secret: secret, counter: counter + offset) == code) {
-      return true;
-    }
+    final expected = _hotp(secret: secret, counter: counter + offset);
+    if (_constantTimeEquals(expected, code)) matched = true;
   }
-  return false;
+  return matched;
+}
+
+/// Compares two equal-length strings without leaking, via timing, how many
+/// leading characters match — codes are compared on a security boundary.
+bool _constantTimeEquals(String a, String b) {
+  if (a.length != b.length) return false;
+  var diff = 0;
+  for (var i = 0; i < a.length; i++) {
+    diff |= a.codeUnitAt(i) ^ b.codeUnitAt(i);
+  }
+  return diff == 0;
 }
 
 String _hotp({required String secret, required int counter}) {
