@@ -9,6 +9,16 @@ weaken any rule while strict mode is on.
 - Architecture: docs/architecture.md   Decisions: docs/adr/
 - Your current task: the card in docs/tasks/ named in the prompt
 
+## Session continuity
+- Prefer continuing in the same chat session for the next task card rather than
+  starting a fresh one. A fresh session re-pays Flutter/Gradle setup
+  (`flutter pub get`, `flutter analyze`'s full lint pass, the Gradle wrapper
+  download) on its first `scripts/check.sh` run, which costs more than the
+  unrelated history carried in a continuing session.
+- Start a fresh session instead only when the current one has grown long
+  enough that it is being summarized/compacted, or the user asks for a clean
+  start.
+
 ## How you work
 1. Work on ONE task card at a time, on its own branch: task/<card-id>-<short-name>.
 2. Read the card, the FR sections it cites and the relevant ADRs before coding.
