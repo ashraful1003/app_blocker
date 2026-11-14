@@ -2,8 +2,10 @@ import 'package:blocker/policy/totp.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // RFC 6238 Appendix B test vectors (SHA-1), truncated to 6 digits
-// (the standard 8-digit vectors mod 10^6).
-const secret = '12345678901234567890';
+// (the standard 8-digit vectors mod 10^6). The RFC's key is the ASCII
+// string '12345678901234567890'; base32-encoded, as a real secret would be
+// shown to an authenticator app, that is 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ'.
+const secret = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
 
 void main() {
   group('generateCode (RFC 6238 SHA-1 vectors)', () {
@@ -24,6 +26,34 @@ void main() {
         );
       });
     }
+
+    test('accepts a lowercase secret the same as uppercase', () {
+      expect(
+        generateCode(secret: secret.toLowerCase(), unixSeconds: 59),
+        generateCode(secret: secret, unixSeconds: 59),
+      );
+    });
+
+    test('rejects a negative timestamp', () {
+      expect(
+        () => generateCode(secret: secret, unixSeconds: -1),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects an empty secret', () {
+      expect(
+        () => generateCode(secret: '', unixSeconds: 59),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects a secret with non-base32 characters', () {
+      expect(
+        () => generateCode(secret: '1234', unixSeconds: 59),
+        throwsArgumentError,
+      );
+    });
   });
 
   group('isValidCode', () {
