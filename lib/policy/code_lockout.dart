@@ -19,10 +19,20 @@ class CodeLockout {
     return now - lockedOutAt < _lockoutDuration;
   }
 
+  /// Clears a lockout that has expired by [now], resetting the wrong-attempt
+  /// counter so the next 5 wrong attempts are counted fresh.
+  void _clearExpiredLockout(Duration now) {
+    if (_lockedOutAt != null && !isLockedOut(now)) {
+      _wrongAttempts = 0;
+      _lockedOutAt = null;
+    }
+  }
+
   /// Records a wrong code entered at the monotonic time [now]. Ignored if
-  /// already locked out: a caller must check [isLockedOut] before accepting
+  /// still locked out: a caller must check [isLockedOut] before accepting
   /// any code, and a wrong attempt during lockout must not extend it.
   void recordWrongAttempt(Duration now) {
+    _clearExpiredLockout(now);
     if (isLockedOut(now)) return;
     _wrongAttempts++;
     if (_wrongAttempts >= _maxWrongAttempts) {
@@ -31,9 +41,10 @@ class CodeLockout {
   }
 
   /// Records a correct code entered at the monotonic time [now], resetting
-  /// the wrong-attempt counter. Ignored if already locked out: a correct
-  /// code must still be rejected for the rest of the lockout window.
+  /// the wrong-attempt counter. Ignored if still locked out: a correct code
+  /// must still be rejected for the rest of the lockout window.
   void recordCorrectAttempt(Duration now) {
+    _clearExpiredLockout(now);
     if (isLockedOut(now)) return;
     _wrongAttempts = 0;
     _lockedOutAt = null;

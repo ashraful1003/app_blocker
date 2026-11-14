@@ -9,7 +9,7 @@
 | T-M1-03 | Schedule evaluation with overnight windows | DONE | T-M1-01 |
 | T-M1-04 | Daily limit tracking | DONE | T-M1-01 |
 | T-M1-05 | TOTP code validation | DONE | — |
-| T-M1-06 | Code lockout after 5 wrong attempts | TODO | T-M1-05 |
+| T-M1-06 | Code lockout after 5 wrong attempts | DONE | T-M1-05 |
 | T-M1-07 | 24-hour wait logic | TODO | T-M1-01 |
 | T-M1-08 | Streak counting and reset | TODO | T-M1-01, T-M1-02 |
 | T-M1-09 | Rules snapshot format and serialization | TODO | T-M1-03, T-M1-04 |

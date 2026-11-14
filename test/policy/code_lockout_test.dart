@@ -72,9 +72,15 @@ void main() {
         }
         expect(lockout.isLockedOut(const Duration(minutes: 15)), isFalse);
 
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < 4; i++) {
           lockout.recordWrongAttempt(const Duration(minutes: 15));
+          expect(
+            lockout.isLockedOut(const Duration(minutes: 15)),
+            isFalse,
+            reason: 'only ${i + 1} fresh wrong attempt(s) so far',
+          );
         }
+        lockout.recordWrongAttempt(const Duration(minutes: 15));
         expect(lockout.isLockedOut(const Duration(minutes: 15)), isTrue);
       },
     );
